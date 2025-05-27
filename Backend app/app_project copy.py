@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # --- Загрузка последней модели ---
 def get_latest_model(directory):
-    """Находит последнюю обученную модель"""
+    """Находит последнюю обученную модель""" #
     try:
         files = [f for f in os.listdir(directory) if f.endswith('.pkl')]
         latest_file = max(files, key=lambda x: os.path.getmtime(os.path.join(directory, x)))
