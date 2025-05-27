@@ -1,0 +1,7 @@
+cianparser
+pandas
+flask
+numpy
+scikit-learn
+category_encoders
+matplotlib

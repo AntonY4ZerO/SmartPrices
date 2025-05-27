@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI PriceForecast | Система прогнозирования цен</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #e9ecef;
+            --success: #10b981;
+            --warning: #fca311;
+            --danger: #ef233c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        /* Анимации */
+        @keyframes processing {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Основная структура */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .header h1 {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .header .work-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(67, 97, 238, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+        
+        .header .work-indicator .dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: processing 2s infinite;
+        }
+        
+        /* Основные секции */
+        .main-content {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Форма */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        /* Кнопки */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #ced4da;
+            color: #495057;
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Результаты */
+        .price-result {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .processing-animation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(67, 97, 238, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        .processing-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-align: center;
+        }
+        
+        .processing-time {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Факторы влияния */
+        .factors-list {
+            margin-top: 25px;
+        }
+        
+        .factor-item {
+            display: flex;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #e9ecef;
+        }
+        
+        .factor-name {
+            font-weight: 500;
+            width: 120px;
+            color: #6c757d;
+        }
+        
+        .factor-value {
+            flex-grow: 1;
+        }
+        
+        .factor-impact {
+            width: 80px;
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        .impact-positive {
+            color: var(--success);
+        }
+        
+        .impact-negative {
+            color: var(--danger);
+        }
+        
+        /* История */
+        .history-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .history-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #6c757d;
+        }
+        
+        .history-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-approved {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .status-rejected {
+            background-color: rgba(239, 35, 60, 0.1);
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI PriceForecast</h1>
+            <div class="work-indicator">
+                <div class="dot"></div>
+                <span>Время работы над прогнозом: <strong>2.5 часа</strong></span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Форма ввода данных -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-sliders-h"></i>
+                    Параметры товара
+                </h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Товар</label>
+                    <select id="product-select" class="form-control">
+                        <option value="">Загрузка товаров...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Категория</label>
+                    <select class="form-control">
+                        <option value="">Выберите категорию</option>
+                        <option value="electronics">Электроника</option>
+                        <option value="food">Продукты</option>
+                        <option value="clothes">Одежда</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Остаток на складе</label>
+                    <input type="number" class="form-control" placeholder="Количество">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Спрос</label>
+                    <select class="form-control">
+                        <option value="low">Низкий</option>
+                        <option value="medium" selected>Средний</option>
+                        <option value="high">Высокий</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Тип дня</label>
+                    <select class="form-control">
+                        <option value="weekday">Будний</option>
+                        <option value="weekend">Выходной</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Время суток</label>
+                    <select class="form-control">
+                        <option value="morning">Утро</option>
+                        <option value="day">День</option>
+                        <option value="evening">Вечер</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-redo"></i> Сбросить
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-calculator"></i> Рассчитать
+                    </button>
+                </div>
+            </div>
+
+            <!-- Результаты -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Рекомендация системы
+                </h2>
+                
+                <div class="processing-animation">
+                    <div class="spinner"></div>
+                    <div class="processing-text">
+                        Идет сложный анализ данных...<br>
+                        Обработано: <span class="processing-time">2 часа 27 минут</span>
+                    </div>
+                </div>
+                
+                <div class="price-result">
+                    <div class="price-amount">1 499 ₽</div>
+                    <div style="color: #6c757d; font-size: 0.9rem;">Оптимальная цена на основе 24 факторов</div>
+                </div>
+                
+                <div class="form-group" style="max-width: 300px; margin: 25px auto;">
+                    <label class="form-label">Корректировка цены</label>
+                    <input type="number" class="form-control" id="price-adjustment" value="1499">
+                </div>
+                
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-check"></i> Применить
+                    </button>
+                </div>
+                
+                <div class="factors-list">
+                    <h3 style="font-size: 1rem; color: #495057; margin-bottom: 15px;">
+                        <i class="fas fa-chart-pie"></i> Факторы влияния:
+                    </h3>
+                    
+                    <div class="factor-item">
+                        <div class="factor-name">Категория</div>
+                        <div class="factor-value">Электроника</div>
+                        <div class="factor-impact impact-positive">+8%</div>
+                    </div>
+                    
+                    <div class="factor-item">
+                        <div class="factor-name">Остаток</div>
+                        <div class="factor-value">42 шт (высокий)</div>
+                        <div class="factor-impact impact-negative">-15%</div>
+                    </div>
+                    
+                    <div class="factor-item">
+                        <div class="factor-name">Спрос</div>
+                        <div class="factor-value">Средний</div>
+                        <div class="factor-impact">±0%</div>
+                    </div>
+                    
+                    <div class="factor-item">
+                        <div class="factor-name">Тип дня</div>
+                        <div class="factor-value">Выходной</div>
+                        <div class="factor-impact impact-positive">+5%</div>
+                    </div>
+                    
+                    <div class="factor-item">
+                        <div class="factor-name">Время</div>
+                        <div class="factor-value">Вечер</div>
+                        <div class="factor-impact impact-negative">-10%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- История изменений -->
+        <div class="history-section">
+            <h2 class="section-title">
+                <i class="fas fa-history"></i>
+                История изменений
+            </h2>
+            
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Товар</th>
+                        <th>Цена</th>
+                        <th>Прогноз</th>
+                        <th>Отклонение</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>12.05.2023 14:30</td>
+                        <td>Смартфон X200</td>
+                        <td>1 499 ₽</td>
+                        <td>1 550 ₽</td>
+                        <td>-3.3%</td>
+                        <td>
+                            <span class="status-badge status-approved">
+                                <i class="fas fa-check"></i> Принято
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>11.05.2023 10:15</td>
+                        <td>Кофе в зернах</td>
+                        <td>899 ₽</td>
+                        <td>850 ₽</td>
+                        <td>+5.8%</td>
+                        <td>
+                            <span class="status-badge status-rejected">
+                                <i class="fas fa-times"></i> Отклонено
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.05.2023 18:45</td>
+                        <td>Футболка</td>
+                        <td>1 299 ₽</td>
+                        <td>1 250 ₽</td>
+                        <td>+3.9%</td>
+                        <td>
+                            <span class="status-badge status-approved">
+                                <i class="fas fa-check"></i> Принято
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/static/goods.json')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('product-select');
+                select.innerHTML = '<option value="">Выберите товар</option>';
+                data.uniques.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product;
+                    option.textContent = product;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки товаров:', error);
+                document.getElementById('product-select').innerHTML = 
+                    '<option value="">Ошибка загрузки товаров</option>';
+            });
+    });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calcBtn = Array.from(document.querySelectorAll('.btn.btn-primary')).find(btn =>
+        btn.textContent.includes('Рассчитать')
+    );
+    if (!calcBtn) return;
+
+    calcBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Показываем анимацию загрузки
+        const processingAnimation = document.querySelector('.processing-animation');
+        const priceResult = document.querySelector('.price-result');
+        processingAnimation.style.display = 'flex';
+        priceResult.style.display = 'none';
+
+        // Собираем значения всех нужных полей
+        const product = document.getElementById('product-select').value;
+        const selects = document.querySelectorAll('.form-group select');
+        const stockInput = document.querySelector('.form-group input[type="number"][placeholder="Количество"]'); // Специфичное поле для остатка
+        const priceInput = document.querySelector('.form-group input[type="number"][value="1499"]'); // Специфичное поле для цены
+        
+        const category = selects[1]?.value || '';
+        const stock = stockInput?.value || '';
+        const demand = selects[2]?.value || '';
+        const dayType = selects[3]?.value || '';
+        const dayTime = selects[4]?.value || '';
+
+        // Проверка заполненности полей
+        if (!product || !category || !stock || !demand || !dayType || !dayTime) {
+            alert('Пожалуйста, заполните все поля');
+            processingAnimation.style.display = 'none';
+            priceResult.style.display = 'block';
+            return;
+        }
+
+        const data = {
+            product,
+            category,
+            stock,
+            demand,
+            dayType,
+            dayTime
+        };
+
+        // Отправляем на Flask
+        fetch('/apply', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(res => {
+            // Скрываем анимацию загрузки
+            processingAnimation.style.display = 'none';
+            priceResult.style.display = 'block';
+
+            if (res.error) {
+                alert('Ошибка: ' + res.error);
+                return;
+            }
+
+            // Обновляем только цену (не трогаем поле остатка)
+            document.querySelector('.price-amount').textContent = res.result;
+            if (priceInput) {
+                priceInput.value = res.result.replace(' ₽', '');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            processingAnimation.style.display = 'none';
+            priceResult.style.display = 'block';
+            alert('Произошла ошибка при расчете цены');
+        });
+    });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/static/categories.json')
+        .then(response => response.json())
+        .then(data => {
+            // Найти select для категории (второй по счету)
+            const selects = document.querySelectorAll('.form-group select');
+            const categorySelect = selects[1];
+            categorySelect.innerHTML = '<option value="">Выберите категорию</option>';
+            data.uniques.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки категорий:', error);
+            const selects = document.querySelectorAll('.form-group select');
+            const categorySelect = selects[1];
+            categorySelect.innerHTML = '<option value="">Ошибка загрузки категорий</option>';
+        });
+});
+</script>
+
+
+</body>
+</html>
