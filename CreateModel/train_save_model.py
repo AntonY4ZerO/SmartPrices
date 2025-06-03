@@ -23,7 +23,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def save_model(output_dir='models', name="linear"):
+
+def save_model(output_dir='models', koefs_dir = 'koefs', name="linear"):
+
     logger.info(f"Начало обучения модели. Выходная директория: {output_dir}, имя модели: {name}")
     
     try:
@@ -44,6 +46,22 @@ def save_model(output_dir='models', name="linear"):
         modelLR = LinearRegression()
         modelLR.fit(X_train, y_train)
         logger.info("Модель успешно обучена")
+
+        # Получаем коэффициенты модели
+        coefficients = modelLR.coef_
+        abs_coefficients = np.abs(coefficients)
+        importance_percentage = 100 * abs_coefficients / abs_coefficients.sum()
+        feature_names = X_train.columns
+
+        # Сохраняем коэффициенты в бинарный файл
+        percentage_of_tags = []
+        for feature, percentage in zip(feature_names, importance_percentage):
+            percentage_of_tags.append({"tag": feature, "percent": round(float(percentage), 0)})
+        with open(koefs_dir+'/'+'koefs.pkl', 'wb') as f:
+            pickle.dump(percentage_of_tags, f)
+        print(percentage_of_tags)
+        
+
         
         # Предсказания и метрики
         predictions = modelLR.predict(X_test)

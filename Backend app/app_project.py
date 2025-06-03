@@ -1,117 +1,183 @@
-from flask import Flask, request, jsonify, render_template
-import logging
-import pickle
-import numpy as np
-import pandas as pd
+from flask import Flask, request, render_template, jsonify
 import os
+import pickle
+import logging
+import pandas as pd
+import json
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Настройка логирования с UTF-8
+HISTORY_FILE = './Backend app/static/price_history.json'
+
+def load_history():
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
+def save_history(history):
+    with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
+
+@app.route('/save_history', methods=['POST'])
+def api_save_history():
+    try:
+        data = request.get_json()
+        history = load_history()
+        
+        # Добавляем новую запись
+        history.insert(0, data)
+        
+        # Сохраняем в файл
+        save_history(history)
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/get_history')
+def api_get_history():
+    try:
+        history = load_history()
+        return jsonify({'history': history})
+    except Exception as e:
+        return jsonify({'history': [], 'error': str(e)})
+
+
+# --- Логирование (по желанию, можно убрать) ---
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('./logs/app.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
 
 
+# --- Загрузка последней модели ---
 def get_latest_model(directory):
-    """Находит последнюю обученную модель"""
+    """Находит последнюю обученную модель""" #
     try:
-        # Получаю самый последний pkl файл
         files = [f for f in os.listdir(directory) if f.endswith('.pkl')]
         latest_file = max(files, key=lambda x: os.path.getmtime(os.path.join(directory, x)))
         return os.path.join(directory, latest_file)
-    except:
+    except Exception as e:
+        logger.error(f"Ошибка поиска модели: {e}")
         return None
 
-# Инициализация модели глобально
 model = None
 
 def load_model():
-    """Загружает модель при старте приложения"""
     global model
+    global percentage_of_tags
     model_path = get_latest_model('./models')
+    koefs_path = get_latest_model('./koefs')
     if model_path:
         try:
             with open(model_path, 'rb') as file:
                 model = pickle.load(file)
-            logger.info("Model was founded")
+            logger.info(f"Модель загружена: {model_path}")
+
+            with open(koefs_path, 'rb') as file:
+                percentage_of_tags = pickle.load(file)
+            logger.info(f"Коэффициенты загружены: {koefs_path}")
+
         except Exception as e:
+            logger.error(f"Ошибка загрузки модели: {e}")
             model = None
     else:
-        logger.error("No model found in directory")
+        logger.error("Модель не найдена в ./models")
 
-# Загружаем модель при старте
+# --- Загрузка модели при старте ---
 load_model()
 
 @app.route('/')
 def index():
     return render_template('website.html')
 
-@app.route('/api/numbers', methods=['POST'])
-@app.route('/api/numbers', methods=['POST'])
-def process_numbers():
-    logger.info("Request received for /api/numbers")
+@app.route('/apply', methods=['POST'])
+def apply():
+
     data = request.get_json()
+    print("Получены данные из формы:", data)
 
-    if not data:
-        logger.error("Error: no data received")
-        return {'status': 'error', 'message': 'Ошибка: данные не получены'}, 400
+    product = data.get('product')
+    category = data.get('category')
+    stock = int(data.get('stock'))
+    demand = data.get('demand')
+    dayType = data.get('dayType')
+    dayTime = data.get('dayTime')
+
+    # Обработка продукта
+    with open('./Backend app/static/goods.json', encoding='utf-8') as f:
+        goods_data = json.load(f)
+        product = goods_data['uniques'].index(str(product))
+
+    # Обработка категории
+    with open('./Backend app/static/categories.json', encoding='utf-8') as f:
+        categories_data = json.load(f)
+        category = categories_data['uniques'].index(str(category))
+
+    # обработка спроса
+    if demand == "Низкий":
+        demand = 0
+    elif demand == "Средний":
+        demand = 1
+    else:
+        demand = 2
+
+    # Обработка дня недели
+    if dayType == "Будний":
+        dayType = 0
+    else:
+        dayType = 1
+
     
-    try:
+    
 
-        num1 = float(data.get('number1', 0))
-        num2 = int(data.get('number2', 1))
-        num3 = int(data.get('number3', 1))
-        num4 = int(data.get('number4', 1))
-        
-        logger.info("Input data: "+str(num1)+" "+str(num2)+" "+str(num3)+" "+str(num4))
+    input_data = {
+            'Товар': [product],
+            'Категория': [category],
+            'Остаток': [stock],
+            'Тип дня': [dayType],
+            'Спрос': [demand]
+    }
 
-        if model is None:
-            raise RuntimeError("Модель не загружена")
+    # Подготовка данных о факторах влияния
+    factors = [
+        {"name": percentage_of_tags[0]["tag"], "value": "", "impact": f"{percentage_of_tags[0]['percent']}%"},
+        {"name": percentage_of_tags[1]["tag"], "value": "", "impact": f"{percentage_of_tags[1]['percent']}%"},
+        {"name": percentage_of_tags[2]["tag"], "value": "", "impact": f"{percentage_of_tags[2]['percent']}%"},
+        {"name": percentage_of_tags[3]["tag"], "value": "", "impact": f"{percentage_of_tags[3]['percent']}%"},
+        {"name": percentage_of_tags[4]["tag"], "value": "", "impact": f"{percentage_of_tags[4]['percent']}%"}
+    ]
 
-        # Создаем DataFrame с правильными признаками
-        input_data = {
-            'total_meters': [num1],
-            'rooms_count': [num2],
-            'floors_count': [num3],
-            'floor': [num4]
-            
-        }
-        
-        if hasattr(model, 'feature_names_in_') and 'relative_floor' in model.feature_names_in_:
-            input_data['relative_floor'] = [num4 / max(1, num3)]
-        
-        input_df = pd.DataFrame(input_data)
-        
-        if hasattr(model, 'feature_names_in_'):
-            input_df = input_df[list(model.feature_names_in_)]
-        
-        prediction = int(model.predict(input_df).round(0))
-
-        logger.info("Prediction price: "+str(prediction))
-        
-        return {
-            'status': 'success',
-            'price': prediction,
-            'formatted_price': prediction,
-            'message': f'Предсказанная цена: {prediction}'
-        }
-
-    except Exception as e:
-        logger.error(f"Error in prediction: {str(e)}", exc_info=True)
-        return {
-            'status': 'error',
-            'message': f'Ошибка: {str(e)}'
-        }, 400
+    input_df = pd.DataFrame(input_data)
 
 
+    print(input_df)
+
+    prediction = int(model.predict(input_df).round(0))
+
+    print(prediction)
+
+
+    # Пример использования модели (если она нужна)
+    # if model is not None:
+    #     prediction = model.predict(...)
+    #     return jsonify({'result': str(prediction)})
+    # else:
+    #     return jsonify({'result': 'Модель не загружена'})
+
+    # Пока просто склеиваем все значения в строку
+    #result = ' '.join(str(v) for v in data.values())
+    return jsonify({
+            'result': f"{prediction} ₽",
+            'factors': factors,
+            'success': True
+        })
 
 if __name__ == '__main__':
-    logger.info("Starting server...")
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(debug=True, port=8000)

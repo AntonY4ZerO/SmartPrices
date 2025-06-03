@@ -31,7 +31,8 @@
             background-color: #f5f7fa;
             color: var(--dark);
             line-height: 1.6;
-        }
+        } 
+
         
         /* Анимации */
         @keyframes processing {
@@ -305,7 +306,7 @@
             <h1>AI PriceForecast</h1>
             <div class="work-indicator">
                 <div class="dot"></div>
-                <span>Время работы над прогнозом: <strong>2.5 часа</strong></span>
+                <!--<span>Время работы над прогнозом: <strong>2.5 часа</strong></span> -->
             </div>
         </div>
 
@@ -341,10 +342,10 @@
                 
                 <div class="form-group">
                     <label class="form-label">Спрос</label>
-                    <select class="form-control">
-                        <option value="low">Низкий</option>
-                        <option value="medium" selected>Средний</option>
-                        <option value="high">Высокий</option>
+                    <select class="form-control" id="demand-select">
+                        <option value="Низкий">Низкий</option>
+                        <option value="Средний" selected>Средний</option>
+                        <option value="Высокий">Высокий</option>
                     </select>
                 </div>
                 
@@ -355,8 +356,9 @@
                         <option value="weekend">Выходной</option>
                     </select>
                 </div>
-                
+                <!--
                 <div class="form-group">
+                
                     <label class="form-label">Время суток</label>
                     <select class="form-control">
                         <option value="morning">Утро</option>
@@ -364,7 +366,7 @@
                         <option value="evening">Вечер</option>
                     </select>
                 </div>
-                
+                -->
                 <div style="display: flex; gap: 10px; margin-top: 25px;">
                     <button class="btn btn-outline">
                         <i class="fas fa-redo"></i> Сбросить
@@ -384,29 +386,25 @@
                 
                 <div class="processing-animation">
                     <div class="spinner"></div>
-                    <div class="processing-text">
-                        Идет сложный анализ данных...<br>
-                        Обработано: <span class="processing-time">2 часа 27 минут</span>
-                    </div>
                 </div>
                 
                 <div class="price-result">
-                    <div class="price-amount">1 499 ₽</div>
-                    <div style="color: #6c757d; font-size: 0.9rem;">Оптимальная цена на основе 24 факторов</div>
+                    <div class="price-amount"></div>
+                    <div style="color: #6c757d; font-size: 0.9rem;">Оптимальная цена</div>
                 </div>
                 
                 <div class="form-group" style="max-width: 300px; margin: 25px auto;">
                     <label class="form-label">Корректировка цены</label>
-                    <input type="number" class="form-control" id="price-adjustment" value="1499">
+                    <input type="number" class="form-control" id="price-adjustment" value="0">
                 </div>
                 
                 <div style="display: flex; justify-content: center; gap: 10px;">
                     <button class="btn btn-outline">
                         <i class="fas fa-save"></i> Сохранить
                     </button>
-                    <button class="btn btn-primary">
+                    <!--<button class="btn btn-primary">
                         <i class="fas fa-check"></i> Применить
-                    </button>
+                    </button> -->
                 </div>
                 
                 <div class="factors-list">
@@ -415,33 +413,33 @@
                     </h3>
                     
                     <div class="factor-item">
+                        <div class="factor-name">Товар</div>
+                        <div class="factor-value"></div>
+                        <div class="factor-impact impact-positive"></div>
+                    </div>
+                    
+                    <div class="factor-item">
                         <div class="factor-name">Категория</div>
-                        <div class="factor-value">Электроника</div>
-                        <div class="factor-impact impact-positive">+8%</div>
+                        <div class="factor-value"></div>
+                        <div class="factor-impact impact-negative"></div>
                     </div>
                     
                     <div class="factor-item">
                         <div class="factor-name">Остаток</div>
-                        <div class="factor-value">42 шт (высокий)</div>
-                        <div class="factor-impact impact-negative">-15%</div>
-                    </div>
-                    
-                    <div class="factor-item">
-                        <div class="factor-name">Спрос</div>
-                        <div class="factor-value">Средний</div>
-                        <div class="factor-impact">±0%</div>
+                        <div class="factor-value"></div>
+                        <div class="factor-impact"></div>
                     </div>
                     
                     <div class="factor-item">
                         <div class="factor-name">Тип дня</div>
-                        <div class="factor-value">Выходной</div>
-                        <div class="factor-impact impact-positive">+5%</div>
+                        <div class="factor-value"></div>
+                        <div class="factor-impact impact-positive"></div>
                     </div>
                     
                     <div class="factor-item">
-                        <div class="factor-name">Время</div>
-                        <div class="factor-value">Вечер</div>
-                        <div class="factor-impact impact-negative">-10%</div>
+                        <div class="factor-name">Спрос</div>
+                        <div class="factor-value"></div>
+                        <div class="factor-impact impact-negative"></div>
                     </div>
                 </div>
             </div>
@@ -456,52 +454,18 @@
             
             <table class="history-table">
                 <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Товар</th>
-                        <th>Цена</th>
-                        <th>Прогноз</th>
-                        <th>Отклонение</th>
-                        <th>Статус</th>
-                    </tr>
+            <tr>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Категория</th>
+                <th>Остаток</th>
+                <th>Спрос</th>
+                <th>Прогноз</th>
+                <th>Цена</th>
+            </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>12.05.2023 14:30</td>
-                        <td>Смартфон X200</td>
-                        <td>1 499 ₽</td>
-                        <td>1 550 ₽</td>
-                        <td>-3.3%</td>
-                        <td>
-                            <span class="status-badge status-approved">
-                                <i class="fas fa-check"></i> Принято
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>11.05.2023 10:15</td>
-                        <td>Кофе в зернах</td>
-                        <td>899 ₽</td>
-                        <td>850 ₽</td>
-                        <td>+5.8%</td>
-                        <td>
-                            <span class="status-badge status-rejected">
-                                <i class="fas fa-times"></i> Отклонено
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>10.05.2023 18:45</td>
-                        <td>Футболка</td>
-                        <td>1 299 ₽</td>
-                        <td>1 250 ₽</td>
-                        <td>+3.9%</td>
-                        <td>
-                            <span class="status-badge status-approved">
-                                <i class="fas fa-check"></i> Принято
-                            </span>
-                        </td>
-                    </tr>
+                <tbody id="history-body">
+                    
                 </tbody>
             </table>
         </div>
@@ -548,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const product = document.getElementById('product-select').value;
         const selects = document.querySelectorAll('.form-group select');
         const stockInput = document.querySelector('.form-group input[type="number"][placeholder="Количество"]'); // Специфичное поле для остатка
-        const priceInput = document.querySelector('.form-group input[type="number"][value="1499"]'); // Специфичное поле для цены
+        const priceInput = document.querySelector('.form-group input[type="number"][value="0"]'); // Специфичное поле для цены
         
         const category = selects[1]?.value || '';
         const stock = stockInput?.value || '';
@@ -557,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const dayTime = selects[4]?.value || '';
 
         // Проверка заполненности полей
-        if (!product || !category || !stock || !demand || !dayType || !dayTime) {
+        if (!product || !category || !stock || !demand || !dayType) {
             alert('Пожалуйста, заполните все поля');
             processingAnimation.style.display = 'none';
             priceResult.style.display = 'block';
@@ -569,8 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
             category,
             stock,
             demand,
-            dayType,
-            dayTime
+            dayType
         };
 
         // Отправляем на Flask
@@ -629,6 +592,208 @@ document.addEventListener('DOMContentLoaded', function() {
             const categorySelect = selects[1];
             categorySelect.innerHTML = '<option value="">Ошибка загрузки категорий</option>';
         });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calcBtn = Array.from(document.querySelectorAll('.btn.btn-primary')).find(btn =>
+        btn.textContent.includes('Рассчитать')
+    );
+    if (!calcBtn) return;
+
+    calcBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Показываем анимацию загрузки
+        const processingAnimation = document.querySelector('.processing-animation');
+        const priceResult = document.querySelector('.price-result');
+        processingAnimation.style.display = 'flex';
+        priceResult.style.display = 'none';
+
+        // Собираем значения всех нужных полей
+        const product = document.getElementById('product-select').value;
+        const selects = document.querySelectorAll('.form-group select');
+        const stockInput = document.querySelector('.form-group input[type="number"][placeholder="Количество"]');
+        const priceInput = document.querySelector('.form-group input[type="number"][value="0"]');
+        
+        const category = selects[1]?.value || '';
+        const stock = stockInput?.value || '';
+        const demand = selects[2]?.value || '';
+        const dayType = selects[3]?.value || '';
+        const dayTime = selects[4]?.value || '';
+
+        // Проверка заполненности полей
+        if (!product || !category || !stock || !demand || !dayType) {
+            alert('Пожалуйста, заполните все поля');
+            processingAnimation.style.display = 'none';
+            priceResult.style.display = 'block';
+            return;
+        }
+
+        const data = {
+            product,
+            category,
+            stock,
+            demand,
+            dayType
+        };
+
+        // Отправляем на Flask
+        fetch('/apply', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(res => {
+            // Скрываем анимацию загрузки
+            processingAnimation.style.display = 'none';
+            priceResult.style.display = 'block';
+
+            if (res.error) {
+                alert('Ошибка: ' + res.error);
+                return;
+            }
+
+            // Обновляем цену
+            document.querySelector('.price-amount').textContent = res.result;
+            if (priceInput) {
+                priceInput.value = res.result.replace(' ₽', '');
+            }
+
+            // Обновляем факторы влияния
+            if (res.factors) {
+                const factorsContainer = document.querySelector('.factors-list');
+                const factorItems = factorsContainer.querySelectorAll('.factor-item');
+                
+                res.factors.forEach((factor, index) => {
+                    if (factorItems[index]) {
+                        const factorName = factorItems[index].querySelector('.factor-name');
+                        const factorValue = factorItems[index].querySelector('.factor-value');
+                        const factorImpact = factorItems[index].querySelector('.factor-impact');
+                        
+                        if (factorName) factorName.textContent = factor.name;
+                        if (factorValue) factorValue.textContent = factor.value;
+                        if (factorImpact) {
+                            factorImpact.textContent = factor.impact;
+                            // Определяем класс для цвета (положительный/отрицательный)
+                            if (factor.impact.startsWith('+')) {
+                                factorImpact.className = 'factor-impact impact-positive';
+                            } else if (factor.impact.startsWith('-')) {
+                                factorImpact.className = 'factor-impact impact-negative';
+                            } else {
+                                factorImpact.className = 'factor-impact';
+                            }
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            processingAnimation.style.display = 'none';
+            priceResult.style.display = 'block';
+            alert('Произошла ошибка при расчете цены');
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Загрузка истории из localStorage при открытии страницы
+    loadHistoryFromStorage();
+    
+    // Обработчик кнопки "Сохранить"
+    const saveBtn = document.querySelector('.btn i.fa-save')?.closest('.btn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            saveHistoryEntry();
+        });
+    }
+    
+    // Функция загрузки истории
+    function loadHistoryFromStorage() {
+        const history = JSON.parse(localStorage.getItem('priceHistory')) || [];
+        updateHistoryTable(history);
+        
+        // Дополнительно можно загрузить с сервера при необходимости
+        fetch('/get_history')
+            .then(response => response.json())
+            .then(data => {
+                if (data.history && data.history.length > 0) {
+                    localStorage.setItem('priceHistory', JSON.stringify(data.history));
+                    updateHistoryTable(data.history);
+                }
+            })
+            .catch(error => console.error('Ошибка загрузки истории:', error));
+    }
+    
+    // Функция сохранения новой записи
+    function saveHistoryEntry() {
+        const product = document.getElementById('product-select').value;
+        const category = document.querySelectorAll('.form-group select')[1].value;
+        const stock = document.querySelector('.form-group input[type="number"][placeholder="Количество"]').value;
+        const demand = document.getElementById('demand-select').value;
+        const prediction = document.querySelector('.price-amount').textContent;
+        const price = document.getElementById('price-adjustment').value;
+        
+        if (!product || !price) {
+            alert('Пожалуйста, выберите товар и укажите цену');
+            return;
+        }
+        
+        const now = new Date();
+        const formattedDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth()+1).toString().padStart(2, '0')}.${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        
+        const newEntry = {
+            date: formattedDate,
+            product: product,
+            category: category || '-',
+            stock: stock || '-',
+            demand: demand || 'Средний',
+            prediction: prediction,
+            price: price + ' ₽'
+        };
+        
+        // Сохраняем в localStorage
+        const history = JSON.parse(localStorage.getItem('priceHistory')) || [];
+        history.unshift(newEntry);
+        localStorage.setItem('priceHistory', JSON.stringify(history));
+        
+        // Отправляем на сервер для постоянного хранения
+        fetch('/save_history', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newEntry)
+        }).catch(error => console.error('Ошибка сохранения на сервере:', error));
+        
+        // Обновляем таблицу
+        updateHistoryTable(history);
+        alert('Данные успешно сохранены');
+    }
+    
+    // Функция обновления таблицы
+    function updateHistoryTable(history) {
+        const tbody = document.getElementById('history-body');
+        tbody.innerHTML = '';
+        
+        history.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.date}</td>
+                <td>${item.product}</td>
+                <td>${item.category}</td>
+                <td>${item.stock}</td>
+                <td>${item.demand}</td>
+                <td>${item.prediction}</td>
+                <td>${item.price}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
 });
 </script>
 
